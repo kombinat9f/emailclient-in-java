@@ -1,8 +1,5 @@
 package de.kombinat9f.emailclient.controller;
 
-import static org.mockito.ArgumentMatchers.anyMap;
-import static org.mockito.Mockito.when;
-
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -34,7 +31,6 @@ public class EmailControllerTest {
 
     @Test
     void postWithBodyReturnsAccepted() {
-        when(emailService.sendOneEmail(anyMap())).thenReturn(true);
         Map<String, String> payload = Map.of(
                 "to", "user@example.com",
                 "subject", "Test",
@@ -51,7 +47,6 @@ public class EmailControllerTest {
 
     @Test
     void postWithBodyWithoutPayloadUriReturnsAccepted() {
-        when(emailService.sendOneEmail(anyMap())).thenReturn(true);
         Map<String, String> payload = Map.of(
                 "to", "user@example.com",
                 "message", "message",

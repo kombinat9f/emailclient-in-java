@@ -3,10 +3,12 @@ package de.kombinat9f.emailclient.service;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.HashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -23,18 +25,21 @@ public class EmailService {
         this.mailSender = mailSender;
     }
 
-    public boolean sendOneEmail(Map<String, String> emailContent) {
+    public void sendOneEmail(Map<String, String> emailContent) {
         Map<String, String> emailContentParts = sanitizeData(emailContent);
         if (emailContentParts == null) {
-            return false;
+            logger.warn("Email data is faulty. There could be no email created", emailContent);
         } else if (emailContentParts.get("payloadUri") == null) {
-            sendSimpleEmail(emailContentParts.get("emailAddress"), emailContentParts.get("subject"),
-                    emailContentParts.get("message"));
+            try {
+                sendSimpleEmail(emailContentParts.get("emailAddress"), emailContentParts.get("subject"),
+                        emailContentParts.get("message"));
+            } catch (MailException ex) {
+                logger.error("Sending email is not possible after retry. Check email provider.", ex);
+            }
         } else if (emailContentParts.get("payloadUri") != null) {
             // TODO send complex email with attachment
+            // do we need mime type in post request?
         }
-        return true;
-
     }
 
     private Map<String, String> sanitizeData(Map<String, String> emailContent) {
@@ -82,11 +87,37 @@ public class EmailService {
         return result;
     }
 
-    private void sendSimpleEmail(String to, String subject, String message) {
-        SimpleMailMessage email = new SimpleMailMessage();
-        email.setTo(to);
-        email.setSubject(subject);
-        email.setText(message);
-        mailSender.send(email);
+    // annotation based retryable could not be unit tested sufficiently
+    // maxRetries = 5 means up to 5 retries after the initial attempt -> total attempts = 6
+    private static final int MAX_RETRIES = 5;
+
+    public void sendSimpleEmail(String to, String subject, String message) throws MailException {
+        int attempts = 0;
+        int maxAttempts = 1 + MAX_RETRIES;
+        Optional<MailException> lastException = Optional.empty();
+
+        while (attempts < maxAttempts) {
+            try {
+                SimpleMailMessage email = new SimpleMailMessage();
+                email.setTo(to);
+                email.setSubject(subject);
+                email.setText(message);
+                mailSender.send(email);
+                // success
+                return;
+            } catch (MailException ex) {
+                attempts++;
+                lastException = Optional.of(ex);
+                logger.warn("Attempt {} to send email failed", attempts, ex);
+                // no sleep/backoff here to keep tests fast
+            }
+        }
+        // rethrow the last exception after all attempts failed
+        lastException.ifPresent(value -> { throw value; });
     }
+
+    private void sendMailWithAttachment(String to, String subject, String message, String payloadUri) {
+
+    }
+
 }

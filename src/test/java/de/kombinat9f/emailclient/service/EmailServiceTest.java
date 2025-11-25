@@ -33,8 +33,7 @@ public class EmailServiceTest {
             "message", "Hello!"
         );
 
-        boolean response = emailService.sendOneEmail(content);
-        assertTrue(response);
+        emailService.sendOneEmail(content);
 
         ArgumentCaptor<SimpleMailMessage> captor = ArgumentCaptor.forClass(SimpleMailMessage.class);
         verify(mailSender, times(1)).send(captor.capture());
@@ -45,45 +44,42 @@ public class EmailServiceTest {
     }
 
     @Test
-    void sendOneEmail_invalidEmail_returnsFalseAndDoesNotSend() {
+    void sendOneEmail_invalidEmail_doesNotSendSimpleEmail() {
         Map<String, String> content = Map.of(
             "to", "bad-email",
             "subject", "Hi",
             "message", "Body"
         );
 
-        boolean response = emailService.sendOneEmail(content);
-        assertFalse(response);
+        emailService.sendOneEmail(content);
         verify(mailSender, never()).send(any(SimpleMailMessage.class));
     }
 
     @Test
-    void sendOneEmail_missingSubject_returnsFalse() {
+    void sendOneEmail_missingSubject_doesNotSendSimpleEmail() {
         Map<String, String> content = Map.of(
             "to", "user@example.com",
             "message", "Body"
         );
 
-        boolean response = emailService.sendOneEmail(content);
-        assertFalse(response);
+        emailService.sendOneEmail(content);
         verify(mailSender, never()).send(any(SimpleMailMessage.class));
     }
 
     @Test
-    void sendOneEmail_missingMessage_returnsFalse() {
+    void sendOneEmail_missingMessage_doesNotSendSimpleEmail() {
         Map<String, String> content = Map.of(
             "to", "user@example.com",
             "subject", "Hi"
         );
 
-        boolean response = emailService.sendOneEmail(content);
-        assertFalse(response);
+        emailService.sendOneEmail(content);
         verify(mailSender, never()).send(any(SimpleMailMessage.class));
     }
 
     // TODO adapt to logic with attachment possibility
     @Test
-    void sendOneEmail_withPayloadUri_doesNotSendSimpleEmail_butReturnsTrue() {
+    void sendOneEmail_withPayloadUri_doesNotSendSimpleEmail() {
         Map<String, String> content = Map.of(
             "to", "user@example.com",
             "subject", "Hi",
@@ -91,8 +87,7 @@ public class EmailServiceTest {
             "payloadUri", "http://example.com/payload"
         );
 
-        boolean response = emailService.sendOneEmail(content);
-        assertTrue(response);
+        emailService.sendOneEmail(content);
         verify(mailSender, never()).send(any(SimpleMailMessage.class));
     }
 }

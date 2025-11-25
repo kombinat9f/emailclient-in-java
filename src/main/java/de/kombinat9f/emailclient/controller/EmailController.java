@@ -27,10 +27,8 @@ public class EmailController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         // later change to fill kafka topic method and move call of sendOneEmail to kafka listener area
-        boolean success = emailService.sendOneEmail(body);
-        if (!success) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        // from here on asynchronous, failure has to be determined via log as long as there is no status update function
+        emailService.sendOneEmail(body);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
