@@ -15,6 +15,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
+
+import de.kombinat9f.emailclient.controller.AttachmentClient;
+
 import org.springframework.mail.SimpleMailMessage;
 
 @ExtendWith(MockitoExtension.class)
@@ -23,9 +26,12 @@ class EmailServiceRetryTest {
     @Mock
     JavaMailSender mailSender;
 
+    @Mock
+    AttachmentClient attachmentClient;
+
     @Test
     void sendSimpleEmail_retriesAndSucceedsAfter4Failures() {
-        EmailService emailService = new EmailService(mailSender);
+        EmailService emailService = new EmailService(mailSender, attachmentClient);
 
         AtomicInteger counter = new AtomicInteger(0);
         doAnswer(invocation -> {
@@ -50,7 +56,7 @@ class EmailServiceRetryTest {
 
     @Test
     void sendSimpleEmail_retriesAndFailsAfterMaxAttempts() {
-        EmailService emailService = new EmailService(mailSender);
+        EmailService emailService = new EmailService(mailSender, attachmentClient);
 
         doThrow(new MailSendException("permanent failure")).when(mailSender).send(any(SimpleMailMessage.class));
 
