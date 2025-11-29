@@ -2,7 +2,7 @@ package de.kombinat9f.emailclient;
 
 import org.junit.jupiter.api.Test;
 
-class EmailclientApplicationTests {
+class EmailClientApplicationTests {
 
 	@Test
 	void contextLoads() {

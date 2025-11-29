@@ -11,7 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.client.RestTestClient;
 
-import de.kombinat9f.emailclient.service.EmailService;
+import de.kombinat9f.emailclient.service.EmailTriggerService;
 
 @ExtendWith(MockitoExtension.class)
 public class EmailControllerTest {
@@ -19,7 +19,7 @@ public class EmailControllerTest {
     RestTestClient client;
 
     @Mock
-    private EmailService emailService;
+    private EmailTriggerService emailService;
 
     @InjectMocks
     private EmailController emailController;
