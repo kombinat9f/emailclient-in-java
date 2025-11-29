@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import de.kombinat9f.emailclient.service.EmailService;
+import de.kombinat9f.emailclient.service.EmailTriggerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -25,9 +25,9 @@ public class EmailController {
 
     Logger logger = LoggerFactory.getLogger(EmailController.class);
 
-    private EmailService emailService;
+    private EmailTriggerService emailService;
 
-    public EmailController(EmailService emailService) {
+    public EmailController(EmailTriggerService emailService) {
         this.emailService = emailService;
     }
 
@@ -53,12 +53,9 @@ public class EmailController {
         // kafka listener area
         // from here on asynchronous, failure has to be determined via log as long as
         // there is no status update function
-        // emailService.sendOneEmail(body);
-        // return new ResponseEntity<>(HttpStatus.ACCEPTED);
-
         CompletableFuture.runAsync(() -> {
             try {
-                emailService.sendOneEmail(body);
+                emailService.produceEmailTrigger(body);
             } catch (Exception e) {
                 logger.error("Email request could not be started.", e);
             }
