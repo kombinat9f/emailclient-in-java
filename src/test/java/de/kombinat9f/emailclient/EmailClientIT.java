@@ -19,6 +19,7 @@ import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.test.context.TestPropertySource;
 
 import java.time.Duration;
 import java.util.Collections;
@@ -27,14 +28,15 @@ import java.util.Properties;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestPropertySource("classpath:test_application.properties")
 @EmbeddedKafka(partitions = 3, topics = { "test-emails-topic" })
 class EmailClientIT {
 
     @Autowired
-    private JavaMailSender mailSender;
+    private EmbeddedKafkaBroker embeddedKafka;
 
     @Autowired
-    private EmbeddedKafkaBroker embeddedKafka;
+    private JavaMailSender mailSender;
 
     private GreenMail greenMail;
 
@@ -43,6 +45,17 @@ class EmailClientIT {
         // start SMTP server on default test port (3025)
         greenMail = new GreenMail(ServerSetupTest.SMTP);
         greenMail.start();
+
+        // If the application-provided JavaMailSender tries to authenticate, disable it for tests
+        if (mailSender instanceof JavaMailSenderImpl) {
+            JavaMailSenderImpl impl = (JavaMailSenderImpl) mailSender;
+            impl.setHost("localhost");
+            impl.setPort(3025);
+            impl.setUsername(null);
+            impl.setPassword(null);
+            impl.getJavaMailProperties().put("mail.smtp.auth", "false");
+            impl.getJavaMailProperties().put("mail.smtp.starttls.enable", "false");
+        }
     }
 
     @AfterEach
@@ -54,13 +67,6 @@ class EmailClientIT {
 
     @Test
     void mailIntegrationTest_sendsEmailToGreenMail() throws Exception {
-        // Ensure the mail sender does not attempt SMTP auth during tests
-        if (mailSender instanceof JavaMailSenderImpl) {
-            JavaMailSenderImpl impl = (JavaMailSenderImpl) mailSender;
-            impl.getJavaMailProperties().put("mail.smtp.auth", "false");
-            impl.setUsername(null);
-            impl.setPassword(null);
-        }
         // prepare message
         SimpleMailMessage msg = new SimpleMailMessage();
         msg.setTo("recipient@example.com");
@@ -68,7 +74,7 @@ class EmailClientIT {
         msg.setSubject("Integration test");
         msg.setText("Hello from integration test");
 
-        // send using Spring's JavaMailSender
+        // send using Spring's JavaMailSender (configured from test properties)
         mailSender.send(msg);
 
         // wait for incoming email
