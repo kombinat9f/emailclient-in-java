@@ -1,4 +1,4 @@
-package de.kombinat9f.emailclient.controller;
+package de.kombinat9f.emailclient.client;
 
 import java.io.IOException;
 import java.net.URI;
@@ -9,11 +9,10 @@ import org.springframework.web.client.RestClient;
 @Component
 public class AttachmentClient {
 
-    RestClient restClient = RestClient.create();
+    private final RestClient restClient = RestClient.create();
 
     public byte[] prepareAttachmentFile(URI uriToFile) throws IOException {
-        // not recommended for large files
-        byte[] file = restClient.get().uri(uriToFile).retrieve().body(byte[].class);
-        return file;
+        // basic solution for small to average file sizes
+        return restClient.get().uri(uriToFile).retrieve().body(byte[].class);
     }
 }
