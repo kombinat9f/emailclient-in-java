@@ -69,7 +69,12 @@ public class EmailSenderServiceTest {
         EmailSenderService emailService = new EmailSenderService(mailSender, restClient);
 
 
-        EmailRequest emailRequest = EmailRequest.builder().emailAddress("user@example.com").subject("Test").message("Body").payloadUri("http://example.com/file").dataType("application/octet-stream").build();
+        EmailRequest emailRequest = EmailRequest.builder()
+            .emailAddress("user@example.com")
+            .subject("Test")
+            .message("Body")
+            .payloadUri("http://example.com/file")
+            .dataType("application/octet-stream").build();
 
         emailService.sendOneEmail(emailRequest);
 
