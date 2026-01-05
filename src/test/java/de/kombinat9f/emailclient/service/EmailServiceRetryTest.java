@@ -15,7 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
 
-import de.kombinat9f.emailclient.controller.AttachmentClient;
+import de.kombinat9f.emailclient.client.AttachmentClient;
 import de.kombinat9f.emailclient.domain.EmailRequest;
 
 import org.springframework.mail.SimpleMailMessage;

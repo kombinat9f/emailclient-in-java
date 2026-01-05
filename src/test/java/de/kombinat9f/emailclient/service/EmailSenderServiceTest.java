@@ -1,6 +1,6 @@
 package de.kombinat9f.emailclient.service;
 
-import de.kombinat9f.emailclient.controller.AttachmentClient;
+import de.kombinat9f.emailclient.client.AttachmentClient;
 import de.kombinat9f.emailclient.domain.EmailRequest;
 
 import org.junit.jupiter.api.Test;
@@ -20,7 +20,6 @@ import jakarta.mail.internet.MimeMessage;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Optional;
 import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -74,8 +73,8 @@ public class EmailSenderServiceTest {
             .emailAddress("user@example.com")
             .subject("Test")
             .message("Body")
-            .payloadUri(Optional.of("http://example.com/file"))
-            .dataType(Optional.of("application/octet-stream")).build();
+            .payloadUri("http://example.com/file")
+            .dataType("application/octet-stream").build();
 
         emailService.sendOneEmail(emailRequest);
 

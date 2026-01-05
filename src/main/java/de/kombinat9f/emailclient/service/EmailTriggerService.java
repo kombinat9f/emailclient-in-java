@@ -4,31 +4,36 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import de.kombinat9f.emailclient.domain.EmailRequest;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class EmailTriggerService {
 
+    private static final String TO = "to";
+    private static final String SUBJECT = "subject";
+    private static final String MESSAGE = "message";
+    private static final String PAYLOAD_URI = "payloadUri";
+    private static final String DATA_TYPE = "dataType";
+
     private static String EMAIL_PATTERN = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
-    Logger logger = LoggerFactory.getLogger(EmailTriggerService.class);
 
     private final KafkaEmailTriggerProducer emailProducerService;
 
-    public EmailTriggerService(KafkaEmailTriggerProducer emailTriggerProducer) {
-        this.emailProducerService = emailTriggerProducer;
-    }
-
     public void produceEmailTrigger(Map<String, String> emailContent) {
-        EmailRequest emailData = sanitizeData(emailContent);
+        Optional<EmailRequest> emailData = sanitizeData(emailContent);
 
-        emailProducerService.sendEmailRequest(emailData);
+        if (emailData.isPresent()) {
+            emailProducerService.sendEmailRequest(emailData.get());
+        }
     }
 
-    private EmailRequest sanitizeData(Map<String, String> emailContent) {
+    private Optional<EmailRequest> sanitizeData(Map<String, String> emailContent) {
 
         String emailAddress = null;
         String subject = null;
@@ -36,45 +41,40 @@ public class EmailTriggerService {
         String payloadUri = null;
         String dataType = null;
 
-        if (StringUtils.isNotEmpty(emailContent.get("to"))) {
-            emailAddress = emailContent.get("to");
+        if (StringUtils.isNotEmpty(emailContent.get(TO))) {
+            emailAddress = emailContent.get(TO);
 
             if (!emailAddress.matches(EMAIL_PATTERN)) {
-                logger.warn("Invalid format for Email-Address: " + emailAddress, new IllegalArgumentException());
-                return null;
+                log.warn("Invalid format for Email-Address: {}", emailAddress);
             }
         } else {
-            logger.warn("Missing Email address", new IllegalArgumentException());
-            return null;
+            log.warn("Missing Email address");
         }
 
-        if (StringUtils.isNotEmpty(emailContent.get("subject"))) {
-            subject = emailContent.get("subject");
+        if (StringUtils.isNotEmpty(emailContent.get(SUBJECT))) {
+            subject = emailContent.get(SUBJECT);
         } else {
-            logger.warn("Invalid format for subject for Email to: " + emailAddress, new IllegalArgumentException());
-            return null;
+            log.warn("Invalid format for subject for Email to: {}", emailAddress);
         }
-        if (StringUtils.isNotEmpty(emailContent.get("message"))) {
-            message = emailContent.get("message");
+        if (StringUtils.isNotEmpty(emailContent.get(MESSAGE))) {
+            message = emailContent.get(MESSAGE);
         } else {
-            logger.warn("Invalid format for message for Email to: " + emailAddress, new IllegalArgumentException());
-            return null;
+            log.warn("Invalid format for message for Email to: {}", emailAddress);
         }
-        if (StringUtils.isNotEmpty(emailContent.get("payloadUri"))) {
-            if (StringUtils.isNotEmpty(emailContent.get("dataType"))) {
-                payloadUri = emailContent.get("payloadUri");
-                dataType = emailContent.get("dataType");
-            }
+        if (StringUtils.isNotEmpty(emailContent.get(PAYLOAD_URI))
+                && StringUtils.isNotEmpty(emailContent.get(DATA_TYPE))) {
+            payloadUri = emailContent.get(PAYLOAD_URI);
+            dataType = emailContent.get(DATA_TYPE);
         }
 
         EmailRequest emailRequest = EmailRequest.builder()
-        .emailAddress(emailAddress)
-        .subject(subject)
-        .message(message)
-        .dataType(Optional.ofNullable(dataType))
-        .payloadUri(Optional.ofNullable(payloadUri)).build();
+                .emailAddress(emailAddress)
+                .subject(subject)
+                .message(message)
+                .dataType(dataType)
+                .payloadUri(payloadUri).build();
 
-        return emailRequest;
+        return Optional.of(emailRequest);
     }
 
 }

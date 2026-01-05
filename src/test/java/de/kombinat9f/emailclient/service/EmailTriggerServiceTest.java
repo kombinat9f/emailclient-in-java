@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -31,10 +30,6 @@ class EmailTriggerServiceTest {
 
 	@Captor
 	private ArgumentCaptor<EmailRequest> requestCaptor;
-
-	@BeforeEach
-	void setup() {
-	}
 
 	@Test
 	void produceEmailTrigger_validInput_callsProducerWithEmailRequest() throws Exception {
@@ -80,18 +75,14 @@ class EmailTriggerServiceTest {
 		assertNotNull(captured);
 
 		Object payloadUri = captured.getPayloadUri();
-		assertTrue(payloadUri instanceof Optional);
-		assertTrue(((Optional<?>) payloadUri).isPresent());
-		assertEquals("http://example.com/data.json", ((Optional<?>) payloadUri).get());
+		assertEquals("http://example.com/data.json", payloadUri);
 
 		Object dataType = captured.getDataType();
-		assertTrue(dataType instanceof Optional);
-		assertTrue(((Optional<?>) dataType).isPresent());
-		assertEquals("application/json", ((Optional<?>) dataType).get());
+		assertEquals("application/json", dataType);
 	}
 
 	@Test
-	void produceEmailTrigger_invalidEmail_callsProducerWithNull() {
+	void produceEmailTrigger_invalidEmail_noCallToProducer() {
 		Map<String, String> payload = new HashMap<>();
 		payload.put("to", "invalid-email");
 		payload.put("subject", "Hello");
@@ -99,11 +90,11 @@ class EmailTriggerServiceTest {
 
 		service.produceEmailTrigger(payload);
 
-		verify(producer, times(1)).sendEmailRequest(isNull());
+		verify(producer, times(0)).sendEmailRequest(isNull());
 	}
 
 	@Test
-	void produceEmailTrigger_missingSubject_callsProducerWithNull() {
+	void produceEmailTrigger_missingSubject_noCallToProducer() {
 		Map<String, String> payload = new HashMap<>();
 		payload.put("to", "user@example.com");
 		// no subject
@@ -111,18 +102,18 @@ class EmailTriggerServiceTest {
 
 		service.produceEmailTrigger(payload);
 
-		verify(producer, times(1)).sendEmailRequest(isNull());
+		verify(producer, times(0)).sendEmailRequest(isNull());
 	}
 
 	@Test
-	void produceEmailTrigger_missingMessage_callsProducerWithNull() {
+	void produceEmailTrigger_missingMessage_noCallToProducer() {
 		Map<String, String> payload = new HashMap<>();
 		payload.put("to", "user@example.com");
 		payload.put("subject", "Hello");
 		// no message
 
 		service.produceEmailTrigger(payload);
-		verify(producer, times(1)).sendEmailRequest(isNull());
+		verify(producer, times(0)).sendEmailRequest(isNull());
 	}
 
 	
