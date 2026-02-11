@@ -45,10 +45,7 @@ public class EmailController {
         if (body.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        // later change to fill kafka topic method and move call of sendOneEmail to
-        // kafka listener area
-        // from here on asynchronous, failure has to be determined via log as long as
-        // there is no status update function
+        // async, to add an email job to a queue
         CompletableFuture.runAsync(() -> {
             try {
                 emailService.produceEmailTrigger(body);
@@ -60,5 +57,4 @@ public class EmailController {
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
 
     }
-
 }

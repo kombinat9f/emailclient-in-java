@@ -79,6 +79,7 @@ public class EmailSenderService {
                 email.setText(message);
                 email.setFrom(from);
                 mailSender.send(email);
+                log.info("Email message sent");
                 return;
             } catch (MailException ex) {
                 attempts++;
@@ -118,6 +119,7 @@ public class EmailSenderService {
                 helper.addAttachment("Attachment", dataSource);
                 
                 mailSender.send(mimeMessage);
+                log.info("Email message sent");
                 return;
             } catch (MailException ex) {
                 attempts++;

@@ -92,7 +92,7 @@ class EmailClientIT {
     void kafkaEmbeddedIntegrationTest_producerSendsAndConsumerReceives() {
         String topic = "test-emails-topic";
         String key = "key1";
-        String value = "{\"to\":\"recipient@example.com\",\"subject\":\"Hello\",\"body\":\"hi\"}";
+        String value = "{\"to\":\"recipient@example.com\",\"subject\":\"Hello\",\"message\":\"hi\"}";
 
         // create producer properties pointing to embedded broker
         Properties producerProps = new Properties();

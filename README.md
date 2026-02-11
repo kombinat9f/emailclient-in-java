@@ -1,7 +1,7 @@
 # Emailclient in Java #
 
 ## Intro ##
-This is an example project in Java SDK 25, Springboot 4 and JUnit 6.
+This is an example project in Java SDK 25, Springboot 4 and JUnit 5/6.
 
 It uses a post http controller method, a Restclient to fetch attachments, the new Spring 7 RestTestClient, Spring Kafka and EmbeddedKafka for integration testing, GreenMail for integration testing, Lombok, SWAGGER/OpenAPI, Logging, use of Optionals, Object mapping with Jackson
 
