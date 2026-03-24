@@ -18,7 +18,6 @@ public class KafkaEmailTriggerProducer {
     public void sendEmailRequest(EmailRequest emailRequest) {
         String emailRequestJson = convertToJson(emailRequest);
         kafkaTemplate.send("email-requests", emailRequestJson);
-        log.info("Emailrequest added to kafka queue");
     }
 
     private String convertToJson(EmailRequest emailRequest) {

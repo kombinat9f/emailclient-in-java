@@ -46,7 +46,7 @@ public class EmailSenderService {
             } catch (MailException ex) {
                 log.error("Sending email is not possible after retry. Check email provider.", ex);
             }
-        } else if (emailRequest.getPayloadUri() != null && emailRequest.getDataType() != null) {
+        } else if (emailRequest.getDataType() != null) {
             try {
                 sendEmailWithAttachment(emailRequest.getEmailAddress(), emailRequest.getSubject(),
                         emailRequest.getMessage(), emailRequest.getPayloadUri(), emailRequest.getDataType());
@@ -64,7 +64,7 @@ public class EmailSenderService {
         }
     }
 
-    public void sendEmail(String to, String subject, String message) throws MailException {
+    private void sendEmail(String to, String subject, String message) throws MailException {
         int attempts = 0;
         Optional<MailException> lastException = Optional.empty();
 
@@ -79,7 +79,6 @@ public class EmailSenderService {
                 email.setText(message);
                 email.setFrom(from);
                 mailSender.send(email);
-                log.info("Email message sent");
                 return;
             } catch (MailException ex) {
                 attempts++;
@@ -119,7 +118,6 @@ public class EmailSenderService {
                 helper.addAttachment("Attachment", dataSource);
                 
                 mailSender.send(mimeMessage);
-                log.info("Email message sent");
                 return;
             } catch (MailException ex) {
                 attempts++;

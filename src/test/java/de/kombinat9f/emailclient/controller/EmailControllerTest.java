@@ -1,25 +1,19 @@
 package de.kombinat9f.emailclient.controller;
 
-import java.util.Map;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.client.RestTestClient;
 
-import de.kombinat9f.emailclient.service.EmailTriggerService;
+import java.util.Map;
 
 @ExtendWith(MockitoExtension.class)
 public class EmailControllerTest {
 
     RestTestClient client;
-
-    @Mock
-    private EmailTriggerService emailService;
 
     @InjectMocks
     private EmailController emailController;
@@ -38,7 +32,7 @@ public class EmailControllerTest {
                 "payloadUri", "htttp://cdn.mailpayload.de");
 
         client.post()
-                .uri("/api/email")
+                .uri("/v1/email")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(payload)
                 .exchange()
@@ -53,7 +47,7 @@ public class EmailControllerTest {
                 "subject", "Test");
 
         client.post()
-                .uri("/api/email")
+                .uri("/v1/email")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(payload)
                 .exchange()
@@ -63,7 +57,7 @@ public class EmailControllerTest {
     @Test
     void postWithoutBodyReturnsBadRequest() {
         client.post()
-              .uri("/api/email")
+              .uri("/v1/email")
               .exchange()
               .expectStatus().isBadRequest();
     }
