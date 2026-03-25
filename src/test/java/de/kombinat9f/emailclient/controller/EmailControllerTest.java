@@ -1,7 +1,6 @@
 package de.kombinat9f.emailclient.controller;
 
-import java.util.Map;
-
+import de.kombinat9f.emailclient.service.EmailTriggerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,7 +10,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.client.RestTestClient;
 
-import de.kombinat9f.emailclient.service.EmailTriggerService;
+import java.util.Map;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class EmailControllerTest {
@@ -38,11 +40,12 @@ public class EmailControllerTest {
                 "payloadUri", "htttp://cdn.mailpayload.de");
 
         client.post()
-                .uri("/api/email")
+                .uri("/v1/email")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(payload)
                 .exchange()
                 .expectStatus().isAccepted();
+        verify(emailService, timeout(1000)).produceEmailTrigger(any());
     }
 
     @Test
@@ -53,19 +56,21 @@ public class EmailControllerTest {
                 "subject", "Test");
 
         client.post()
-                .uri("/api/email")
+                .uri("/v1/email")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(payload)
                 .exchange()
                 .expectStatus().isAccepted();
+        verify(emailService, timeout(1000)).produceEmailTrigger(any());
     }
 
     @Test
     void postWithoutBodyReturnsBadRequest() {
         client.post()
-              .uri("/api/email")
+              .uri("/v1/email")
               .exchange()
               .expectStatus().isBadRequest();
+        verify(emailService, never()).produceEmailTrigger(any());
     }
 
 }

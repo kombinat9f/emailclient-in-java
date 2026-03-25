@@ -21,7 +21,6 @@ public class KafkaEmailConsumerService {
         EmailRequest emailRequest = convertFromJson(emailJson);
 
         emailSenderService.sendOneEmail(emailRequest);
-        log.info("Emailrequest read from queue");
     }
 
     private EmailRequest convertFromJson(String emailJson) {

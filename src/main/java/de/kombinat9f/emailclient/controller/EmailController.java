@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Tag(name = "Email Client", description = "Asynchronous API to send an email with optional attachment")
 @RestController
-@RequestMapping("/api/email")
+@RequestMapping("/v1/email")
 @Slf4j
 @RequiredArgsConstructor
 public class EmailController {
@@ -35,11 +35,11 @@ public class EmailController {
     "message":"Body"
     "payloadUri":"http://example.com/file"
     "dataType":"application/octet-stream"
-                            """)
+    """)
     @ApiResponses({
             @ApiResponse(responseCode = "202", description = "If requests could be accepted (execution is not guaranteed)"),
-            @ApiResponse(responseCode = "404", description = "If something is wrong with the request, e.g. missing fields or wrong format"),
-            @ApiResponse(responseCode = "500")})
+            @ApiResponse(responseCode = "400", description = "If something is wrong with the request, e.g. missing fields or wrong format")
+    })
     @PostMapping
     public ResponseEntity<HttpStatus> sendSingleEmail(@RequestBody Map<String, String> body) {
         if (body.isEmpty()) {
