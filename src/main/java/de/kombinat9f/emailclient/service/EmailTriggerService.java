@@ -21,7 +21,7 @@ public class EmailTriggerService {
     private static final String PAYLOAD_URI = "payloadUri";
     private static final String DATA_TYPE = "dataType";
 
-    private static String EMAIL_PATTERN = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
+    private static final String EMAIL_PATTERN = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
 
     private final KafkaEmailTriggerProducer emailProducerService;
 

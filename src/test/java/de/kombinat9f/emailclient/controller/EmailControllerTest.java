@@ -1,19 +1,28 @@
 package de.kombinat9f.emailclient.controller;
 
+import de.kombinat9f.emailclient.service.EmailTriggerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.client.RestTestClient;
 
 import java.util.Map;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+
 @ExtendWith(MockitoExtension.class)
 public class EmailControllerTest {
 
     RestTestClient client;
+
+    @Mock
+    private EmailTriggerService emailService;
 
     @InjectMocks
     private EmailController emailController;
@@ -37,6 +46,7 @@ public class EmailControllerTest {
                 .body(payload)
                 .exchange()
                 .expectStatus().isAccepted();
+        verify(emailService).produceEmailTrigger(any());
     }
 
     @Test
@@ -52,6 +62,7 @@ public class EmailControllerTest {
                 .body(payload)
                 .exchange()
                 .expectStatus().isAccepted();
+        verify(emailService).produceEmailTrigger(any());
     }
 
     @Test
@@ -60,6 +71,7 @@ public class EmailControllerTest {
               .uri("/v1/email")
               .exchange()
               .expectStatus().isBadRequest();
+        verify(emailService, never()).produceEmailTrigger(any());
     }
 
 }
