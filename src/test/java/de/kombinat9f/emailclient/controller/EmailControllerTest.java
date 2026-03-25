@@ -13,8 +13,7 @@ import org.springframework.test.web.servlet.client.RestTestClient;
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class EmailControllerTest {
@@ -46,7 +45,7 @@ public class EmailControllerTest {
                 .body(payload)
                 .exchange()
                 .expectStatus().isAccepted();
-        verify(emailService).produceEmailTrigger(any());
+        verify(emailService, timeout(1000)).produceEmailTrigger(any());
     }
 
     @Test
@@ -62,7 +61,7 @@ public class EmailControllerTest {
                 .body(payload)
                 .exchange()
                 .expectStatus().isAccepted();
-        verify(emailService).produceEmailTrigger(any());
+        verify(emailService, timeout(1000)).produceEmailTrigger(any());
     }
 
     @Test
